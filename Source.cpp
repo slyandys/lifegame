@@ -94,6 +94,7 @@ bool compare(int array1[52][102], int array2[52][102])
 //by a '*', and a dead or vacant cell by a '-'.
 void print(int array[52][102])
 {
+	//Clears the screen so the program can start fresh.
 	system("cls");
 	for (int j = 1; j < 51; j++)
 	{
@@ -119,36 +120,29 @@ int main()
 	bool comparison;
 	string decoration;
 
-	//Instructions on how the program is used, along with the rules of the game.
+	//Instructions on the program, along with the rules of the game.
 	cout << endl << "This program is a C++ implementation of John Conway's Game of Life."
 		<< endl << "With it, you can simulate how \"cells\" interact with each other." << endl
-		<< endl << "There are two types of neighborhoods you can choose, the"
-		<< endl << "Moore, and the Von Neumann.  The Moore neighborhood checks"
-		<< endl << "all 8 surrounding cells, whereas the Von Neumann checks"
-		<< endl << "only the 4 cardinal directions: (N, S, E, and W)." << endl
+		<< endl << "The cell will checks its neighbour--all 8 surrounding cells"
 		<< endl << "The rules of the \"Game of Life\" are as follows:" << endl
-		<< endl << "1. Any live cell with fewer than two live neighbors dies, as if caused by under-population."
-		<< endl << "2. Any live cell with two or three live neighbors lives on to the next generation."
-		<< endl << "3. Any live cell with more than three live neighbors dies, as if by overcrowding."
-		<< endl << "4. Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction." << endl
+		<< endl << "R1. Any live cell with fewer than two live neighbors dies, as if caused by under-population."
+		<< endl << "R2. Any live cell with two or three live neighbors lives on to the next generation."
+		<< endl << "R3. Any live cell with more than three live neighbors dies for overcrowding."
+		<< endl << "R4. Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction." << endl
 		<< endl << "The initial configuration (Generation 0) of the board is determined randomly."
 		<< endl << "Every hundred Generations you will get the option to end or continue the simulation."
 		<< endl << "If a system becomes \"stable\" (meaning the system does not change from one"
 		<< endl << "generation to the next), the simulation will end automatically." << endl << endl;
+	
 	//Loop to check if user wants to keep simulating.
 	do
 	{
-		//Loop to check for proper inputs.
-		do
-		{
-			system("pause");
-			//cout << "Which neighborhood would you like to use (m or v): ";
-			neighborhood = 'm';
-			//cin >> neighborhood;
-		} while (neighborhood != 'm' && neighborhood != 'v');
-		//Clears the screen so the program can start fresh.
-		//system("clear");
+		//Set system pause to let the player finish reading those above
+		system("pause");
+		neighborhood = 'm';
+		
 		int i = 0;
+
 		//Loop that does the bulk of the simulation.
 		do
 		{
