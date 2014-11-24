@@ -2,7 +2,7 @@
 //This implementation uses several nested for loops as well as two-dimensional
 //arrays to create a grid for the cells in the simulation to interact.
 //The array that is displayed to the user is 50 x 100, but actual size
-//of the array is 52 x 102.  The reason for this is to make the 
+//of the array is row x column.  The reason for this is to make the 
 //calculations easier for the cells on the outermost "frame" of the grid.
 
 #include <iostream>
@@ -11,55 +11,57 @@
 #include <stdlib.h>
 #include <time.h>
 
+#define row 50
+#define column 50
+
+
 using namespace std;
 
-//Copies one array to another.
-void copy(int array1[52][102], int array2[52][102])
+//Copies array1 into array2.
+void copy(int array1[row][column], int array2[row][column])
 {
-	for (int j = 0; j < 52; j++)
+	for (int i = 0; i < row; i++)
 	{
-		for (int i = 0; i < 102; i++)
-			array2[j][i] = array1[j][i];
+		for (int j = 0; j < column; j++)
+			array2[i][j] = array1[i][j];
 	}
 }
 
 //The life function is the core of this program.
 //It counts the number of cells surrounding the center cell, and 
 //determines whether it lives, dies, or stays the same.
-void life(int array[52][102], char choice)
+void life(int array[row][column], char choice)
 {
 	//Copies the main array to a temp array so changes can be entered into a grid
 	//without effecting the other cells and the calculations being performed on them.
-	int temp[52][102];
+	int temp[row][column];
 	copy(array, temp);
-	for (int j = 1; j < 51; j++)
+	for (int i = 1; i < row-1; i++)
 	{
-		for (int i = 1; i < 101; i++)
+		for (int j = 1; j < column-1; j++)
 		{
 			if (choice == 'm')
 			{
-				//The neighborhood checks all 8 cells surrounding the current cell in the array.
+				//This calculation is applied for cells not on boarder
+				//The neighborhood checks all 9 cells including itself and the surrounding neighbour in the array.
 				int count = 0;
-				count = array[j - 1][i] +
-					array[j - 1][i - 1] +
-					array[j][i - 1] +
-					array[j + 1][i - 1] +
-					array[j + 1][i] +
-					array[j + 1][i + 1] +
-					array[j][i + 1] +
-					array[j - 1][i + 1];
-				//The cell dies.
-				if (count < 2 || count > 3)
-					temp[j][i] = 0;
-				//The cell stays the same.
-				if (count == 2)
-					temp[j][i] = array[j][i];
-				//The cell either stays alive, or is "born".
-				if (count == 3)
-					temp[j][i] = 1;
+				count = array[i - 1][j - 1] + array[i][j - 1] + array[i + 1][j - 1] +
+						array[i - 1][j]     + array[i][j]	  + array[i + 1][j] +
+						array[i - 1][j + 1] + array[i][j + 1] + array[i + 1][j + 1];
+
+				//The cell dies when neighbor<3 or neighbor>4.
+				if (count < 3 || count > 4)
+					temp[i][j] = 0;
+				//The cell stays the same when neighbor=3 or =4.
+				if (count == 3 || count == 4)
+					temp[i][j] = array[i][j];
+				//The cell is "born" when neighbor=3 and itself is died.
+				if (count == 3 && array[i][j] == 0)
+					temp[i][j] = 1;
 			}
 		}
 	}
+
 	//Copies the completed temp array back to the main array.
 	copy(temp, array);
 }
@@ -69,12 +71,12 @@ void life(int array[52][102], char choice)
 //becomes stable before the 100th generation. This
 //occurs fairly often in the Von Neumann neighborhood,
 //but almost never in the Moore neighborhood.
-bool compare(int array1[52][102], int array2[52][102])
+bool compare(int array1[row][column], int array2[row][column])
 {
 	int count = 0;
-	for (int j = 0; j < 52; j++)
+	for (int j = 0; j < row; j++)
 	{
-		for (int i = 0; i < 102; i++)
+		for (int i = 0; i < column; i++)
 		{
 			if (array1[j][i] == array2[j][i])
 				count++;
@@ -83,24 +85,30 @@ bool compare(int array1[52][102], int array2[52][102])
 	//Since the count gets incremented every time the cells are exactly the same,
 	//an easy way to check if the two arrays are equal is to compare the count to 
 	//the dimensions of the array multiplied together.
-	if (count == 52 * 102)
+	if (count == row * column)
+	{
+		//cout << "~ they are the same" << endl;
 		return true;
+	}	
 	else
+	{
 		return false;
+	}
+		
 }
 
-//This function prints the 50 x 100 part of the array, since that's the only
+//This function prints the row-2 x column-2 part of the array, since that's the only
 //portion of the array that we're really interested in. A live cell is marked
 //by a '*', and a dead or vacant cell by a '-'.
-void print(int array[52][102])
+void print(int array[row][column])
 {
 	//Clears the screen so the program can start fresh.
 	system("cls");
-	for (int j = 1; j < 51; j++)
+	for (int i = 1; i < row-1; i++)
 	{
-		for (int i = 1; i < 101; i++)
+		for (int j = 1; j < column-1; j++)
 		{
-			if (array[j][i] == 1)
+			if (array[i][j] == 1)
 				cout << '*';
 			else
 				cout << '-';
@@ -111,9 +119,9 @@ void print(int array[52][102])
 
 int main()
 {
-	int gen0[52][102];
-	int todo[52][102];
-	int backup[52][102];
+	int gen0[row][column];
+	int todo[row][column];
+	int backup[row][column];
 	char neighborhood;
 	char again;
 	char cont;
@@ -134,7 +142,7 @@ int main()
 		<< endl << "If a system becomes \"stable\" (meaning the system does not change from one"
 		<< endl << "generation to the next), the simulation will end automatically." << endl << endl;
 	
-	//Loop to check if user wants to keep simulating.
+	//Loop for user if someone wants to keep simulating.
 	do
 	{
 		//Set system pause to let the player finish reading those above
@@ -148,18 +156,20 @@ int main()
 		{
 			//Generates the initial random state of the game board.
 			srand(time(NULL));
-			//The actual array is 102 x 52, but it's easier to just leave the surrounding part of
+			//The actual array is column x row, but it's easier to just leave the surrounding part of
 			//the array blank so it doesn't effect the calculations in the life function above.
-			for (int j = 1; j < 51; j++)
+			for (int i = 1; i < row-1; i++)
 			{
-				for (int i = 1; i < 101; i++)
-					gen0[j][i] = 0;// rand() % 2;
+				for (int j = 1; j < column - 1; j++)
+					gen0[i][j] = 0;// rand() % 2;
 			}
-			for (int j = 1; j < 10; j++)
+			//test
+			for (int i = 2; i < 10; i++)
 			{
-				for (int i = 1; i < 10; i++)
-					gen0[j][i] = 1;
+				for (int j = 2; j < 10; j++)
+					gen0[i][j] = 1;
 			}
+
 			//Determines how big the decoration should be.
 			if (i < 10)
 				decoration = "#############";
@@ -171,10 +181,12 @@ int main()
 				decoration = "################";
 			else
 				decoration = "#################";
+
 			//Prints the generation.  If i == 0, the gen0 array is copied to the 
 			//todo array, and is printed before any functions act upon it.
 			cout << decoration << endl << "Generation " << i
 				<< ":" << endl << decoration << endl << endl;
+
 			//Initializes the arrays by copying the gen0 array to the todo array.
 			if (i == 0)
 				copy(gen0, todo);
@@ -184,7 +196,7 @@ int main()
 			i++;
 			//Pauses the system for 1/10 of a second in order to give the screen
 			//time to refresh.
-			system("sleep .1");
+			//system("sleep 1");
 			//Checks whether the generation is a multiple of 100 to ask 
 			//the user if they want to continue the simulation. If they
 			//wish to end, the program breaks out of the loop to ask if
