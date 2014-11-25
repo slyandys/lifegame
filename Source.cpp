@@ -11,8 +11,8 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define row 50
-#define column 50
+#define row 30
+#define column 30
 
 
 using namespace std;
@@ -36,28 +36,95 @@ void life(int array[row][column], char choice)
 	//without effecting the other cells and the calculations being performed on them.
 	int temp[row][column];
 	copy(array, temp);
-	for (int i = 1; i < row-1; i++)
+
+	for (int i = 0; i < row; i++)
 	{
-		for (int j = 1; j < column-1; j++)
+		for (int j = 0; j < column; j++)
 		{
 			if (choice == 'm')
 			{
-				//This calculation is applied for cells not on boarder
-				//The neighborhood checks all 9 cells including itself and the surrounding neighbour in the array.
 				int count = 0;
-				count = array[i - 1][j - 1] + array[i][j - 1] + array[i + 1][j - 1] +
-						array[i - 1][j]     + array[i][j]	  + array[i + 1][j] +
-						array[i - 1][j + 1] + array[i][j + 1] + array[i + 1][j + 1];
 
+				//top left corner
+				if (i == 0 && j == 0)
+				{
+					count = array[i][j]		+ array[i][j + 1]  +
+							array[i + 1][j] + array[i + 1][j + 1];
+				}
+
+				//top boarder
+				else if (i == 0 && j != 0 && j != (column - 1))
+				{
+					count = array[i][j - 1]		+ array[i][j]	  + array[i][j + 1] + 
+							array[i + 1][j - 1] + array[i + 1][j] + array[i + 1][j + 1];
+				}
+
+				//top right corner
+				else if (i == 0 && j == (row - 1))
+				{
+					count = array[i][j - 1]		+ array[i][j] +
+							array[i + 1][j - 1] + array[i + 1][j];
+				}
+
+				//bottom left corner
+				else if (i == (row - 1) && j == 0)
+				{
+					count = array[i - 1][j] + array[i - 1][j + 1] +
+							array[i][j]		+ array[i][j + 1];
+				}
+
+				//bottom boarder
+				else if (i == (row - 1) && j != 0 && j != (column - 1))
+				{
+					count = array[i - 1][j - 1] + array[i - 1][j] + array[i - 1][j + 1] +
+							array[i][j - 1]		+ array[i][j]	  + array[i][j + 1];
+				}
+
+				//bottom right corner
+				else if (i == (row - 1) && j == (column - 1))
+				{
+					count = array[i - 1][j - 1] + array[i - 1][j] +
+							array[i][j - 1]		+ array[i][j];
+				}
+
+				//left boarder
+				else if (j == 0 && i != 0 && i != (row - 1))
+				{
+					count = array[i - 1][j] + array[i - 1][j + 1] +
+							array[i][j]		+ array[i][j + 1]	  +
+							array[i + 1][j] + array[i + 1][j + 1];
+				}
+				
+				//right boarder
+				else if (j == (column - 1) && i != 0 && i != (row - 1))
+				{
+					count = array[i - 1][j - 1] + array[i - 1][j] + 
+							array[i][j - 1]		+ array[i][j]	  + 
+							array[i + 1][j - 1] + array[i + 1][j];
+
+				}
+				//This calculation is applied for cells not on boarders or corners
+				//The neighborhood checks all 9 cells including itself and the surrounding neighbour in the array.
+				else
+				{
+					count = array[i - 1][j - 1] + array[i - 1][j] + array[i - 1][j + 1] +
+							array[i][j - 1]     + array[i][j]	  + array[i][j + 1]		+
+							array[i + 1][j - 1] + array[i + 1][j] + array[i + 1][j + 1];
+				}
+
+				
+				//Rules
 				//The cell dies when neighbor<3 or neighbor>4.
-				if (count < 3 || count > 4)
+				if (array[i][j] == 1 && (count < 3 || count > 4))
 					temp[i][j] = 0;
 				//The cell stays the same when neighbor=3 or =4.
-				if (count == 3 || count == 4)
-					temp[i][j] = array[i][j];
-				//The cell is "born" when neighbor=3 and itself is died.
-				if (count == 3 && array[i][j] == 0)
+				if (array[i][j] == 1 && (count == 3 || count == 4))
 					temp[i][j] = 1;
+				//The cell is "born" when neighbor=3 and itself is died.
+				if (array[i][j] == 0 && count == 3)
+					temp[i][j] = 1;
+				if (array[i][j] == 0 && count != 3)
+					temp[i][j] = 0;
 			}
 		}
 	}
@@ -104,9 +171,9 @@ void print(int array[row][column])
 {
 	//Clears the screen so the program can start fresh.
 	system("cls");
-	for (int i = 1; i < row-1; i++)
+	for (int i = 0; i < row-1; i++)
 	{
-		for (int j = 1; j < column-1; j++)
+		for (int j = 0; j < column-1; j++)
 		{
 			if (array[i][j] == 1)
 				cout << '*';
@@ -156,17 +223,18 @@ int main()
 		{
 			//Generates the initial random state of the game board.
 			srand(time(NULL));
-			//The actual array is column x row, but it's easier to just leave the surrounding part of
+			//The actual array is row x column, but it's easier to just leave the surrounding part of
 			//the array blank so it doesn't effect the calculations in the life function above.
-			for (int i = 1; i < row-1; i++)
+			//initalized the map
+			for (int i = 0; i < row-1; i++)
 			{
-				for (int j = 1; j < column - 1; j++)
+				for (int j = 0; j < column - 1; j++)
 					gen0[i][j] = 0;// rand() % 2;
 			}
 			//test
-			for (int i = 2; i < 10; i++)
+			for (int i = 0; i < 10; i++)
 			{
-				for (int j = 2; j < 10; j++)
+				for (int j = 0; j < 10; j++)
 					gen0[i][j] = 1;
 			}
 
@@ -219,7 +287,7 @@ int main()
 			//the same or the user chooses to quit.
 			comparison = compare(todo, backup);
 			if (comparison == false)
-				system("clear");
+				system("cls");//system("clear");
 			if (comparison == true)
 				cout << endl;
 		} while (comparison == false);
