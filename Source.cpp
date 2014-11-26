@@ -11,8 +11,8 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define row 100
-#define column 90
+#define row 12000 //max:12000
+#define column 12000 //max:12000
 
 using namespace std;
 
@@ -37,8 +37,9 @@ void life(float *array, char choice)
 	temp = (float*)malloc(sizeof(float)*row*column);
 	copy(array, temp);
 
-	
+	clock_t mstart, mend;
 
+	mstart = clock();
 	
 	for (int i = 0; i < row; i++)
 	{
@@ -132,8 +133,12 @@ void life(float *array, char choice)
 		}
 	}
 
+	mend = clock();
+	printf("model start time: %d ms\n", mstart);
+	printf("model end time: %d ms\n", mend);
 	//Copies the completed temp array back to the main array.
 	copy(temp, array);
+	free(temp);
 }
 
 //Checks to see if two arrays are exactly the same. 
@@ -191,7 +196,7 @@ void main()
 {
 	float *gen0;// double gen0[row][column];
 	float *todo;// [row][column];
-	float *backup;// [row][column];
+	//float *backup;// [row][column];
 	char neighborhood;
 	char again;
 	char cont;
@@ -201,7 +206,7 @@ void main()
 	//alloc
 	gen0 = (float*)malloc(sizeof(float)*row*column);
 	todo = (float*)malloc(sizeof(float)*row*column);
-	backup = (float*)malloc(sizeof(float)*row*column);
+	//backup = (float*)malloc(sizeof(float)*row*column);
 
 	//Instructions on the program, along with the rules of the game.
 	cout << endl << "This program is a C++ implementation of John Conway's Game of Life."
@@ -266,8 +271,8 @@ void main()
 			//Initializes the arrays by copying the gen0 array to the todo array.
 			if (i == 0)
 				copy(gen0, todo);
-			copy(todo, backup);
-			print(todo);
+			//copy(todo, backup);
+			//print(todo);
 			
 			clock_t CAstart, CAfinish;
 			//time_t start, finish;
@@ -280,8 +285,8 @@ void main()
 			//time(&CAfinish);
 			//clock_t CAduration = (double);
 			//cout << "the CAS duration is " << (double)(CAfinish - CAstart) << endl;
-			printf("%dms\n", CAstart);
-			printf("%dms\n", CAfinish);
+			printf("CAmodel start time: %d ms\n", CAstart);
+			printf("CAmodel end time: %d ms\n", CAfinish);
 			//printf("%dms\n", start);
 			//printf("%dms\n", finish);
 			system("pause");
@@ -323,4 +328,6 @@ void main()
 			cin >> again;
 		} while (again != 'y' && again != 'n');
 	} while (again == 'y');
+	free(gen0);
+	free(todo);
 }
