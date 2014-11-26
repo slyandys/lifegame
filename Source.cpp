@@ -11,32 +11,35 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define row 30
-#define column 30
-
+#define row 100
+#define column 90
 
 using namespace std;
 
 //Copies array1 into array2.
-void copy(int array1[row][column], int array2[row][column])
+void copy(float *array1, float *array2)
 {
 	for (int i = 0; i < row; i++)
 	{
 		for (int j = 0; j < column; j++)
-			array2[i][j] = array1[i][j];
+			array2[i*column + j] = array1[i*column + j];
 	}
 }
 
 //The life function is the core of this program.
 //It counts the number of cells surrounding the center cell, and 
 //determines whether it lives, dies, or stays the same.
-void life(int array[row][column], char choice)
+void life(float *array, char choice)
 {
 	//Copies the main array to a temp array so changes can be entered into a grid
 	//without effecting the other cells and the calculations being performed on them.
-	int temp[row][column];
+	float *temp;// [row][column];
+	temp = (float*)malloc(sizeof(float)*row*column);
 	copy(array, temp);
 
+	
+
+	
 	for (int i = 0; i < row; i++)
 	{
 		for (int j = 0; j < column; j++)
@@ -48,83 +51,83 @@ void life(int array[row][column], char choice)
 				//top left corner
 				if (i == 0 && j == 0)
 				{
-					count = array[i][j]		+ array[i][j + 1]  +
-							array[i + 1][j] + array[i + 1][j + 1];
+					count = array[i*column + j] + array[i*column + j + 1] +
+						array[(i + 1)*column + j] + array[(i + 1)*column + j + 1];
 				}
 
 				//top boarder
 				else if (i == 0 && j != 0 && j != (column - 1))
 				{
-					count = array[i][j - 1]		+ array[i][j]	  + array[i][j + 1] + 
-							array[i + 1][j - 1] + array[i + 1][j] + array[i + 1][j + 1];
+					count = array[i*column + j - 1] + array[i*column + j] + array[i*column + j + 1] +
+						array[(i + 1)*column + j - 1] + array[(i + 1)*column + j] + array[(i + 1) * row + j + 1];
 				}
 
 				//top right corner
 				else if (i == 0 && j == (row - 1))
 				{
-					count = array[i][j - 1]		+ array[i][j] +
-							array[i + 1][j - 1] + array[i + 1][j];
+					count = array[i*column + j - 1] + array[i*column + j] +
+						array[(i + 1)*column + j - 1] + array[(i + 1)*column + j];
 				}
 
 				//bottom left corner
 				else if (i == (row - 1) && j == 0)
 				{
-					count = array[i - 1][j] + array[i - 1][j + 1] +
-							array[i][j]		+ array[i][j + 1];
+					count = array[(i - 1)*column + j] + array[(i - 1)*column + j + 1] +
+						array[i*column + j] + array[i*column + j + 1];
 				}
 
 				//bottom boarder
 				else if (i == (row - 1) && j != 0 && j != (column - 1))
 				{
-					count = array[i - 1][j - 1] + array[i - 1][j] + array[i - 1][j + 1] +
-							array[i][j - 1]		+ array[i][j]	  + array[i][j + 1];
+					count = array[(i - 1)*column + j - 1] + array[(i - 1)*column + j] + array[(i - 1)*column + j + 1] +
+						array[i*column + j - 1] + array[i*column + j] + array[i*column + j + 1];
 				}
 
 				//bottom right corner
 				else if (i == (row - 1) && j == (column - 1))
 				{
-					count = array[i - 1][j - 1] + array[i - 1][j] +
-							array[i][j - 1]		+ array[i][j];
+					count = array[(i - 1)*column + j - 1] + array[(i - 1)*column + j] +
+						array[i*column + j - 1] + array[i*column + j];
 				}
 
 				//left boarder
 				else if (j == 0 && i != 0 && i != (row - 1))
 				{
-					count = array[i - 1][j] + array[i - 1][j + 1] +
-							array[i][j]		+ array[i][j + 1]	  +
-							array[i + 1][j] + array[i + 1][j + 1];
+					count = array[(i - 1)*column + j] + array[(i - 1)*column + j + 1] +
+						array[i*column + j] + array[i*column + j + 1] +
+						array[(i + 1)*column + j] + array[(i + 1)*column + j + 1];
 				}
 				
 				//right boarder
 				else if (j == (column - 1) && i != 0 && i != (row - 1))
 				{
-					count = array[i - 1][j - 1] + array[i - 1][j] + 
-							array[i][j - 1]		+ array[i][j]	  + 
-							array[i + 1][j - 1] + array[i + 1][j];
+					count = array[(i - 1)*column + j - 1] + array[(i - 1)*column + j] +
+						array[i*column + j - 1] + array[i*column + j] +
+						array[(i + 1)*column + j - 1] + array[(i + 1)*column + j];
 
 				}
 				//This calculation is applied for cells not on boarders or corners
 				//The neighborhood checks all 9 cells including itself and the surrounding neighbour in the array.
 				else
 				{
-					count = array[i - 1][j - 1] + array[i - 1][j] + array[i - 1][j + 1] +
-							array[i][j - 1]     + array[i][j]	  + array[i][j + 1]		+
-							array[i + 1][j - 1] + array[i + 1][j] + array[i + 1][j + 1];
+					count = array[(i - 1)*column + j - 1] + array[(i - 1)*column + j] + array[(i - 1)*column + j + 1] +
+						array[i*column + j - 1] + array[i*column + j] + array[i*column + j + 1] +
+						array[(i + 1)*column + j - 1] + array[(i + 1)*column + j] + array[(i + 1)*column + j + 1];
 				}
 
 				
 				//Rules
 				//The cell dies when neighbor<3 or neighbor>4.
-				if (array[i][j] == 1 && (count < 3 || count > 4))
-					temp[i][j] = 0;
+				if (array[i*column + j] == 1 && (count < 3 || count > 4))
+					temp[i*column + j] = 0;
 				//The cell stays the same when neighbor=3 or =4.
-				if (array[i][j] == 1 && (count == 3 || count == 4))
-					temp[i][j] = 1;
+				if (array[i*column + j] == 1 && (count == 3 || count == 4))
+					temp[i*column + j] = 1;
 				//The cell is "born" when neighbor=3 and itself is died.
-				if (array[i][j] == 0 && count == 3)
-					temp[i][j] = 1;
-				if (array[i][j] == 0 && count != 3)
-					temp[i][j] = 0;
+				if (array[i*column + j] == 0 && count == 3)
+					temp[i*column + j] = 1;
+				if (array[i*column + j] == 0 && count != 3)
+					temp[i*column + j] = 0;
 			}
 		}
 	}
@@ -138,44 +141,44 @@ void life(int array[row][column], char choice)
 //becomes stable before the 100th generation. This
 //occurs fairly often in the Von Neumann neighborhood,
 //but almost never in the Moore neighborhood.
-bool compare(int array1[row][column], int array2[row][column])
-{
-	int count = 0;
-	for (int j = 0; j < row; j++)
-	{
-		for (int i = 0; i < column; i++)
-		{
-			if (array1[j][i] == array2[j][i])
-				count++;
-		}
-	}
-	//Since the count gets incremented every time the cells are exactly the same,
-	//an easy way to check if the two arrays are equal is to compare the count to 
-	//the dimensions of the array multiplied together.
-	if (count == row * column)
-	{
-		//cout << "~ they are the same" << endl;
-		return true;
-	}	
-	else
-	{
-		return false;
-	}
-		
-}
+//bool compare(float *array1, float *array2)
+//{
+//	int count = 0;
+//	for (int j = 0; j < row; j++)
+//	{
+//		for (int i = 0; i < column; i++)
+//		{
+//			if (array1[j*column + i] == array2[j*column + i])
+//				count++;
+//		}
+//	}
+//	//Since the count gets incremented every time the cells are exactly the same,
+//	//an easy way to check if the two arrays are equal is to compare the count to 
+//	//the dimensions of the array multiplied together.
+//	if (count == row * column)
+//	{
+//		//cout << "~ they are the same" << endl;
+//		return true;
+//	}	
+//	else
+//	{
+//		return false;
+//	}
+//		
+//}
 
 //This function prints the row-2 x column-2 part of the array, since that's the only
 //portion of the array that we're really interested in. A live cell is marked
 //by a '*', and a dead or vacant cell by a '-'.
-void print(int array[row][column])
+void print(float *array)
 {
 	//Clears the screen so the program can start fresh.
-	system("cls");
+	//system("cls");
 	for (int i = 0; i < row-1; i++)
 	{
 		for (int j = 0; j < column-1; j++)
 		{
-			if (array[i][j] == 1)
+			if (array[i*column + j] == 1)
 				cout << '*';
 			else
 				cout << '-';
@@ -184,16 +187,21 @@ void print(int array[row][column])
 	}
 }
 
-int main()
+void main()
 {
-	int gen0[row][column];
-	int todo[row][column];
-	int backup[row][column];
+	float *gen0;// double gen0[row][column];
+	float *todo;// [row][column];
+	float *backup;// [row][column];
 	char neighborhood;
 	char again;
 	char cont;
 	bool comparison;
 	string decoration;
+
+	//alloc
+	gen0 = (float*)malloc(sizeof(float)*row*column);
+	todo = (float*)malloc(sizeof(float)*row*column);
+	backup = (float*)malloc(sizeof(float)*row*column);
 
 	//Instructions on the program, along with the rules of the game.
 	cout << endl << "This program is a C++ implementation of John Conway's Game of Life."
@@ -222,20 +230,20 @@ int main()
 		do
 		{
 			//Generates the initial random state of the game board.
-			srand(time(NULL));
+			//srand(time(NULL));
 			//The actual array is row x column, but it's easier to just leave the surrounding part of
 			//the array blank so it doesn't effect the calculations in the life function above.
 			//initalized the map
 			for (int i = 0; i < row-1; i++)
 			{
 				for (int j = 0; j < column - 1; j++)
-					gen0[i][j] = 0;// rand() % 2;
+					gen0[i*column + j] = 0;// rand() % 2;
 			}
 			//test
 			for (int i = 0; i < 10; i++)
 			{
 				for (int j = 0; j < 10; j++)
-					gen0[i][j] = 1;
+					gen0[i*column + j] = 1;
 			}
 
 			//Determines how big the decoration should be.
@@ -260,7 +268,24 @@ int main()
 				copy(gen0, todo);
 			copy(todo, backup);
 			print(todo);
+			
+			clock_t CAstart, CAfinish;
+			//time_t start, finish;
+			CAstart = clock();
+			//time(&start);
 			life(todo, neighborhood);
+			//time(&finish);
+			CAfinish = clock();
+			
+			//time(&CAfinish);
+			//clock_t CAduration = (double);
+			//cout << "the CAS duration is " << (double)(CAfinish - CAstart) << endl;
+			printf("%dms\n", CAstart);
+			printf("%dms\n", CAfinish);
+			//printf("%dms\n", start);
+			//printf("%dms\n", finish);
+			system("pause");
+
 			i++;
 			//Pauses the system for 1/10 of a second in order to give the screen
 			//time to refresh.
@@ -285,12 +310,12 @@ int main()
 			//If they aren't the same (they usually aren't) the system
 			//clears the screen and repeats the process until they are
 			//the same or the user chooses to quit.
-			comparison = compare(todo, backup);
-			if (comparison == false)
-				system("cls");//system("clear");
-			if (comparison == true)
-				cout << endl;
-		} while (comparison == false);
+			//comparison = compare(todo, backup);
+			//if (comparison == false)
+			//	system("cls");//system("clear");
+			//if (comparison == true)
+			//	cout << endl;
+		} while (i < 100);// (comparison == false);
 		//Loop to check for proper inputs.
 		do
 		{
@@ -298,5 +323,4 @@ int main()
 			cin >> again;
 		} while (again != 'y' && again != 'n');
 	} while (again == 'y');
-	return 0;
 }
